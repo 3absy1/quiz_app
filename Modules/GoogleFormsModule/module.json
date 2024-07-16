@@ -1,0 +1,11 @@
+{
+    "name": "GoogleFormsModule",
+    "alias": "googleformsmodule",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\GoogleFormsModule\\App\\Providers\\GoogleFormsModuleServiceProvider"
+    ],
+    "files": []
+}

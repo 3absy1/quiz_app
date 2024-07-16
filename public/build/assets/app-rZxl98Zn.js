@@ -1,0 +1,1 @@
+import{_ as e,c as o}from"./_plugin-vue_export-helper-ykxjbzhe.js";const x={data(){return{messages:[],newMessage:""}},mounted(){},methods:{}};function n(s,p,a,c,r,m){return" xxxxxxxx example component xxxxxxxxx jhdh "}const t=e(x,[["render",n]]);o({components:{ExampleComponent:t}}).mount("#app1");console.log("fff");

@@ -1,0 +1,179 @@
+{
+    "formData": [
+        {
+            "questionType": "Multiple Choice",
+            "questionValue": "2 + 2 ",
+            "questionImg": null ,
+            "questionMark": 2 ,
+            "answers": [
+                {
+                    "value": "4",
+                    "isCorrect": true,
+                    "img": null
+                },
+                {
+                    "value": "5",
+                    "isCorrect": false,
+                    "img": null
+                },
+                {
+                    "value": "6",
+                    "isCorrect": false,
+                    "img": null
+                }
+            ]
+
+        },
+        {
+
+            "questionType": "Multiple Choice",
+            "questionValue": "1+1",
+            "questionImg": null ,
+            "questionMark": 2 ,
+
+            "answers": [
+                {
+                    "value": "2",
+                    "isCorrect": true
+                },
+                {
+                    "value": "3",
+                    "isCorrect": false
+                },
+                {
+                    "value": "4",
+                    "isCorrect": false
+                }
+            ]
+        }
+    ],
+    "formSettingData": {
+
+        "questionsMark": 100,
+        "sectionTitle": "Untitled form",
+        "sectionDescription": "Form Description" ,
+        "formImg": null ,
+        "email": false,
+        "password": false,
+        "passwordValue": "",
+        "isOnce": false,
+        "anyTime": false,
+        "duration": 30,
+        "specificTime": true,
+        "examTime": {
+            "date": "2024-01-16",
+            "from": "17:05",
+            "to": "16:06"
+        }
+    }
+}
+
+
+// prepareFormData() {
+    //     // Extract data from formList
+    //     let hasError = [];
+    //     const formData = this.formList.map(item => {
+    //       // Initialize error attributes
+    //       item.questionError = null;
+    //       item.titleError = null;
+    //       item.answerError = null;
+
+    //       // Validate section title
+    //       if (!this.formList[0].formInfo.sectionTitle || this.formList[0].formInfo.sectionTitle.trim() === "") {
+    //         console.log('Title is empty');
+    //         item.titleError = 'Title is empty';
+    //         hasError.push("titleError");
+    //       }
+
+    //       // Validate questionValue and questionImg
+    //       if (!item.questionValue || item.questionValue.trim() === "") {
+    //         console.log('Either questionValue or questionImg must be provided.');
+    //         item.questionError = 'Either questionValue or questionImg must be provided.';
+    //         hasError.push("questionError");
+    //       }
+
+    //       const answers = item.data.map(option => {
+    //         // Validate answers
+    //         let answerError = null;
+
+    //         // Validate answers
+    //         if ((!option.value || option.value.trim() === "")) {
+    //           answerError = ' value must be provided for correct answers.';
+    //           option.answerError = answerError;
+    //           hasError.push("answerError");
+    //         } else {
+    //           option.answerError = null;
+    //         }
+
+    //         return {
+    //           value: option.value,
+    //           isCorrect: option.isCorrect,
+    //           img: option.img
+    //         };
+    //       });
+
+
+    //       // Check if at least one answer is marked as correct
+    //       if (!answers.some(answer => answer.isCorrect)) {
+    //         console.log('At least one answer must be marked as correct.');
+    //         item.answerError = 'At least one answer must be marked as correct.';
+    //         hasError.push("isCorrect");
+    //       }
+
+    //       return {
+    //         questionType: item.selectedValue,
+    //         questionValue: item.questionValue,
+    //         questionImg: item.questionImg,
+    //         questionMark: item.questionMark,
+    //         answers,
+    //       };
+    //     });
+
+    //     // Extract data from formSetting
+    //     const formSettingData = {
+    //       questionsMark: this.totalPoints,
+    //       sectionTitle: this.formList[0].formInfo.sectionTitle,
+    //       sectionDescription: this.formList[0].formInfo.sectionDescription,
+    //       formImg: null,
+    //       email: this.formSetting.username,
+    //       password: this.formSetting.password,
+    //       passwordValue: this.formSetting.passwordValue,
+    //       userQuestionCount:this.formSetting.userQuestionCount,
+    //       isOnce: this.formSetting.isOnce,
+    //       anyTime: this.formSetting.anyTime,
+    //       duration: this.formSetting.duration,
+    //       specificTime: this.formSetting.specificTime,
+    //       examTime: {
+    //         date: this.formSetting.examTime.date,
+    //         from: this.formSetting.examTime.from,
+    //         to: this.formSetting.examTime.to,
+    //       },
+    //     };
+    //       // Combine the extracted data
+    //       const apiData = {
+    //         formData,
+    //         formSettingData,
+    //       };
+
+
+
+    // // Display FormData object
+
+
+
+    //     // if (hasError.length > 0) {
+    //     //   // Display error messages or handle them as needed
+    //     //   toast.error("Form Has Errors!", { autoClose: 2000, position: "top-left" });
+    //     //   console.log("Form list has errors:", hasError);
+    //     //   return;
+    //     // }else{
+    //     //     toast.success("Form Sent Successfully!", { autoClose: 2000, position: "top-left" });
+    //     //     this.quizList = apiData
+    //     //     // formDataObj.append('data', apiData);
+
+    //     // }
+
+
+    //     this.prepareFormDataObj(apiData)
+
+    //   },
