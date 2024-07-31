@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('user_question_count');
             $table->integer('degree');
             // $table->string('phone')->nullable();
-            // $table->enum('require_phone', [0, 1])->default(0);
+            $table->enum('require_phone', [0, 1])->default(0);
             $table->enum('require_password', [0, 1])->default(0);
             $table->string('password')->nullable();
             $table->enum('require_email', [0, 1])->default(0);

@@ -210,6 +210,8 @@ class TeacherController extends Controller
         }
     }
 
+                    // ***********************************************************  Edit Form Method  **************************************************************************  //
+
     public function editForm(Request $request, $id)
     {
         try {
@@ -295,7 +297,7 @@ class TeacherController extends Controller
                     'require_email'       => $data->formSettingData['email'] == 'true' ? '1' : '0',
                     'require_password'    => $data->formSettingData['password'] == 'true' ? '1' : '0',
                     // 'phone'               => $data->formSettingData['phone'] ?  $data->formSettingData['phoneValue'] : null,
-                    // 'require_phone'       => $data->formSettingData['phone'] == 'true' ? '1' : '0',
+                    'require_phone'       => $data->formSettingData['phone'] == 'true' ? '1' : '0',
                     'using_count'         => $data->formSettingData['isOnce'] == 'true' ? '1' : '0',
                     'is_any_time'         => $data->formSettingData['anyTime'] == 'true' ? '1' : '0',
                     'time_out'            => $data->formSettingData['anyTime'] ?  $data->formSettingData['duration'] : '0',
@@ -325,32 +327,244 @@ class TeacherController extends Controller
                     ]);
                 }
                 $imageAttr = [];
-                if (!empty($request->files->get('formData')[0]['questionImg'])) {
-                    $imageFile = $request->files->get('formData')[0]['questionImg'];
-                    try {
-                        $imageAttr = $this->uploadImage($imageFile, 'forms', 'image', 'image');
-                    } catch (\Throwable $th) {
+                if (!isset($question['questionImg'])) {
+                        $questions = Question::find($question['questionID']);
+                        if (
+                            empty($question['questionValue']) &&
+                            empty($question['questionType']) &&
+                            empty($question['questionMark'])
+                        ) {
+                            $questions->delete();
+                        } else{
+                            $questions->update([
+                                'question'      =>  $question['questionValue'],
+                                'question_type' =>  $question['questionType'],
+                                'degree'        =>  $question['questionMark'],
+                            ]);
+                            $optionCount=Option::where('question_id',$question['questionID'])->count();
+                            foreach ($question['answers']  as $key => $answer) {
+                                $imageAttr = [];
+                                if($key < $optionCount) {
+
+                                    if (!isset($answer['img'])) {
+                                        $option = Option::find($answer['optionID']);
+                                        if (
+                                            empty($answer['value']) &&
+                                            empty($answer['isCorrect'])
+                                        ) {
+                                            $option->delete();
+                                        }else{
+                                            // dd(1);
+                                            $validator = Validator::make($answer, [
+                                                'value' => 'max:255',
+                                                'isCorrect' => 'max:255',
+                                            ]);
+                                            if ($validator->fails()) {
+                                                return response()->json([
+                                                    'success' => false,
+                                                    'message' => $validator->errors()->all()
+                                                ], 404);
+                                            }
+                                            $option->update([
+                                                'option'        =>   $answer['value'] ?? '',
+                                                'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
+                                            ]);
+                                        }
+                                    }
+                                    else{
+                                        if (!empty($answer['img'])) {
+                                            try {
+                                                $imageAttr = $this->uploadImage($answer['img'], 'forms', 'image', 'image');
+                                            } catch (\Throwable $th) {
+                                            }
+                                        }
+                                        $option = Option::find($answer['optionID']);
+                                        if (
+                                            empty($answer['value']) &&
+                                            empty($answer['isCorrect'])
+                                        ) {
+                                            $option->delete();
+                                        }else{
+                                            // dd(2);
+                                            $validator = Validator::make($answer, [
+                                                'value' => 'max:255',
+                                                'isCorrect' => 'max:255',
+                                            ]);
+                                            if ($validator->fails()) {
+                                                return response()->json([
+                                                    'success' => false,
+                                                    'message' => $validator->errors()->all()
+                                                ], 404);
+                                            }
+                                            $option->update([
+                                                'option'        =>   $answer['value'] ?? '',
+                                                'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
+                                                'image_dir'     =>   $imageAttr['image_dir'] ?? null,
+                                                'image'         =>   $imageAttr['image'] ?? null,
+                                            ]);
+                                        }
+                                    }
+                                } else {
+                                    if (!empty($answer['img'])) {
+                                        try {
+                                            $imageAttr = $this->uploadImage($answer['img'], 'forms', 'image', 'image');
+                                        } catch (\Throwable $th) {
+                                        }
+                                    }
+                                    $validator = Validator::make($answer, [
+                                        'value' => 'required|max:255',
+                                        'isCorrect' => 'required|max:255',
+                                    ]);
+                                    if ($validator->fails()) {
+                                        return response()->json([
+                                            'success' => false,
+                                            'message' => $validator->errors()->all()
+                                        ], 404);
+                                    }
+                                    Option::create([
+                                        'question_id'   =>   $question['questionID'],
+                                        'option'        =>   $answer['value'] ?? '',
+                                        'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
+                                        'created_by'    =>   auth()->id() ?? 0,
+                                        'image_dir'     =>   $imageAttr['image_dir'] ?? null,
+                                        'image'         =>   $imageAttr['image'] ?? null,
+                                    ]);
+
+                                }
+
+
+                            }
+                        }
+
+                } else {
+
+                    if (!empty($question['questionImg'])) {
+                        $imageFile =$question['questionImg'];
+                        try {
+                            $imageAttr = $this->uploadImage($imageFile, 'forms', 'image', 'image');
+                        } catch (\Throwable $th) {
+                        }
                     }
-                }
-                $count=Question::where('form_id', $id)->count();
-                if ($key < $count) {
-                    $questions = Question::find($question['questionID']);
-                    if (
-                        empty($question['questionValue']) &&
-                        empty($question['questionType']) &&
-                        empty($question['questionMark']) &&
-                        empty($imageAttr['image_dir']) &&
-                        empty($imageAttr['image']) &&
-                        count(array_filter($question['answers'], function ($answer) {
-                            return !empty($answer['value']) || !empty($answer['isCorrect']) || !empty($answer['img']);
-                        })) == 0
-                    ) {
-                        $questions->delete();
-                    } else{
-                        $questions->update([
-                            'question'      =>  $question['questionValue'],
+                    $count=Question::where('form_id', $id)->count();
+                    if ($key < $count) {
+                        $questions = Question::find($question['questionID']);
+                        if (
+                            empty($question['questionValue']) &&
+                            empty($question['questionType']) &&
+                            empty($question['questionMark']) &&
+                            empty($imageAttr['image_dir']) &&
+                            empty($imageAttr['image'])
+                        ) {
+                            $questions->delete();
+                        } else{
+                            $questions->update([
+                                'question'      =>  $question['questionValue'],
+                                'question_type' =>  $question['questionType'],
+                                'degree'        =>  $question['questionMark'],
+                                'image_dir'     =>  $imageAttr['image_dir'] ?? null,
+                                'image'         =>  $imageAttr['image'] ?? null,
+                            ]);
+                            $optionCount=Option::where('question_id',$question['questionID'])->count();
+                            foreach ($question['answers']  as $kkk => $answer) {
+
+                            if($kkk < $optionCount) {
+                                $imageAttr = [];
+                                if (!isset($answer['img'])) {
+                                    $option = Option::find($answer['optionID']);
+                                    if (
+                                        empty($answer['value']) &&
+                                        empty($answer['isCorrect'])
+                                    ) {
+                                        $option->delete();
+                                    }else{
+                                        // dd($answer['optionID']);
+                                        $validator = Validator::make($answer, [
+                                            'value' => 'max:255',
+                                            'isCorrect' => 'max:255',
+                                        ]);
+                                        if ($validator->fails()) {
+                                            return response()->json([
+                                                'success' => false,
+                                                'message' => $validator->errors()->all()
+                                            ], 404);
+                                        }
+                                        $option->update([
+                                            'option'        =>   $answer['value'] ?? '',
+                                            'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
+                                        ]);
+                                    }
+                                }
+                                else{
+                                    if (!empty($answer['img'])) {
+                                        try {
+                                            $imageAttr = $this->uploadImage($answer['img'], 'forms', 'image', 'image');
+                                        } catch (\Throwable $th) {
+                                        }
+                                    }
+                                    $option = Option::find($answer['optionID']);
+                                    if (
+                                        empty($answer['value']) &&
+                                        empty($answer['isCorrect'])
+                                    ) {
+                                        $option->delete();
+                                    }else{
+                                        // dd(4);
+                                        $validator = Validator::make($answer, [
+                                            'value' => 'max:255',
+                                            'isCorrect' => 'max:255',
+                                        ]);
+                                        if ($validator->fails()) {
+                                            return response()->json([
+                                                'success' => false,
+                                                'message' => $validator->errors()->all()
+                                            ], 404);
+                                        }
+                                        $option->update([
+                                            'option'        =>   $answer['value'] ?? '',
+                                            'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
+                                            'image_dir'     =>   $imageAttr['image_dir'] ?? null,
+                                            'image'         =>   $imageAttr['image'] ?? null,
+                                        ]);
+                                    }
+                                }
+                            }else{
+                                $imageAttr = [];
+                                if (!empty($answer['img'])) {
+                                    try {
+                                        $imageAttr = $this->uploadImage($answer['img'], 'forms', 'image', 'image');
+                                    } catch (\Throwable $th) {
+                                    }
+                                }
+                                // dd('create2');
+                                $validator = Validator::make($answer, [
+                                    'value' => 'required|max:255',
+                                    'isCorrect' => 'required|max:255',
+                                ]);
+                                if ($validator->fails()) {
+                                    return response()->json([
+                                        'success' => false,
+                                        'message' => $validator->errors()->all()
+                                    ], 404);
+                                }
+                                Option::create([
+                                    'question_id'   =>   $question['questionID'],
+                                    'option'        =>   $answer['value'] ?? '',
+                                    'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
+                                    'created_by'    =>   auth()->id() ?? 0,
+                                    'image_dir'     =>   $imageAttr['image_dir'] ?? null,
+                                    'image'         =>   $imageAttr['image'] ?? null,
+                                ]);
+                            }
+
+                            }
+                        }
+                    } else {
+                        $question_store =  Question::create([
+                            'form_id'       =>  $form->id,
+                            'question'      =>  $question['questionValue'] ?? 0,
                             'question_type' =>  $question['questionType'],
                             'degree'        =>  $question['questionMark'],
+                            'created_by'    =>  auth()->id() ?? 0,
                             'image_dir'     =>  $imageAttr['image_dir'] ?? null,
                             'image'         =>  $imageAttr['image'] ?? null,
                         ]);
@@ -363,8 +577,8 @@ class TeacherController extends Controller
                                 }
                             }
                             $validator = Validator::make($answer, [
-                                'value' => 'max:255',
-                                'isCorrect' => 'max:255',
+                                'value' => 'required|max:255',
+                                'isCorrect' => 'required|max:255',
                             ]);
                             if ($validator->fails()) {
                                 return response()->json([
@@ -372,53 +586,18 @@ class TeacherController extends Controller
                                     'message' => $validator->errors()->all()
                                 ], 404);
                             }
-                            $option = Option::find($answer['optionID']);
-                            $option->update([
+                            Option::create([
+                                'question_id'   =>   $question_store->id,
                                 'option'        =>   $answer['value'] ?? '',
                                 'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
+                                'created_by'    =>   auth()->id() ?? 0,
                                 'image_dir'     =>   $imageAttr['image_dir'] ?? null,
                                 'image'         =>   $imageAttr['image'] ?? null,
                             ]);
                         }
                     }
-                } else{
-                    $question_store =  Question::create([
-                        'form_id'       =>  $form->id,
-                        'question'      =>  $question['questionValue'] ?? 0,
-                        'question_type' =>  $question['questionType'],
-                        'degree'        =>  $question['questionMark'],
-                        'created_by'    =>  auth()->id() ?? 0,
-                        'image_dir'     =>  $imageAttr['image_dir'] ?? null,
-                        'image'         =>  $imageAttr['image'] ?? null,
-                    ]);
-                    foreach ($question['answers']  as $key => $answer) {
-                        $imageAttr = [];
-                        if (!empty($answer['img'])) {
-                            try {
-                                $imageAttr = $this->uploadImage($answer['img'], 'forms', 'image', 'image');
-                            } catch (\Throwable $th) {
-                            }
-                        }
-                        $validator = Validator::make($answer, [
-                            'value' => 'required|max:255',
-                            'isCorrect' => 'required|max:255',
-                        ]);
-                        if ($validator->fails()) {
-                            return response()->json([
-                                'success' => false,
-                                'message' => $validator->errors()->all()
-                            ], 404);
-                        }
-                        Option::create([
-                            'question_id'   =>   $question_store->id,
-                            'option'        =>   $answer['value'] ?? '',
-                            'is_true'       =>   $answer['isCorrect'] == 'true' ? '1' : '0',
-                            'created_by'    =>   auth()->id() ?? 0,
-                            'image_dir'     =>   $imageAttr['image_dir'] ?? null,
-                            'image'         =>   $imageAttr['image'] ?? null,
-                        ]);
-                    }
                 }
+
             }
 
             return response()->json([
@@ -432,6 +611,10 @@ class TeacherController extends Controller
             ], 404);
         }
     }
+
+
+                    // *************************************************************  End Edit Form **************************************************************************  //
+
 
     public function uploadImage($file, $folder_name = 'users', $input = 'image', $returnName = 'image')
     {

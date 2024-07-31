@@ -15,6 +15,7 @@ class ShowFormReqResource extends JsonResource
             // 'image'            => $this->image ?  asset($this->image_dir . $this->image) : null,
             "require_email"    => $this->require_email == 1 ? true : false,
             "require_password" => $this->password == true ? true : false,
+            "require_phone"    => $this->require_phone == 1 ? true : false,
             "using_count"      => $this->using_count == 1 ? true : false,
             'is_any_time'      => $this->is_any_time == 1 ? true : false,
             'is_specific_time' => $this->is_specific_time == 1 ? true : false,

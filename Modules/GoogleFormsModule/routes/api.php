@@ -17,21 +17,7 @@ use Modules\GoogleFormsModule\App\Http\Controllers\TeacherController;
     | is assigned the "api" middleware group. Enjoy building your API!
     |
 */
-
-// Route::get('admin/teachers', [AdminController::class, 'teachers']);
-// Route::post('admin/teacher/create', [AdminController::class, 'createTeacher']);
-// Route::put('admin/teacher/{id}/edit', [AdminController::class, 'editTeacher']);
-// Route::delete('admin/teacher/{id}/delete', [AdminController::class, 'deleteTeacher']);
-
-
-// Route::get('/admin/students', [AdminController::class, 'students']);
-// Route::post('admin/student/create', [AdminController::class, 'createStudent']);
-// Route::put('admin/student/{id}/edit', [AdminController::class, 'editStudent']);
-// Route::delete('admin/student/{id}/delete', [AdminController::class, 'deleteStudent']);
-
-// Route::get('/admin/forms', [AdminController::class, 'forms']);
-
-
+Route::post('admin/generateQuiz', [GoogleFormsModuleController::class, 'generateQuiz']);
 
 Route::post('/teacher/register', [TeacherController::class, 'register']);
 Route::post('/teacher/login', [TeacherController::class, 'login']);
@@ -56,24 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/teacher/logout', [TeacherController::class, 'logout']);
     Route::post('googleformsmodules', [GoogleFormsModuleController::class, 'store']);
 });
-
-// Route::middleware('auth:teacher')->group(function () {
-// });
-
-
-// Route::prefix('googleformsmodules')->group(function () {
-
-//     Route::post('register', [AuthController::class, 'register'])->name('register');
-//     Route::post('login', [AuthController::class, 'login'])->name('login');
-
-//     Route::middleware('auth:sanctum')->group(function () {
-
-//         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-//         Route::get('showAdmin', [AuthController::class, 'showAdmin'])->name('showAdmin');
-//         Route::patch('updateAdmin', [AuthController::class, 'update'])->name('updateAdmin');
-//     });
-// });
-
 
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function () {

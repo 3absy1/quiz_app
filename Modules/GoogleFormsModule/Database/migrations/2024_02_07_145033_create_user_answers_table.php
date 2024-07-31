@@ -13,6 +13,7 @@ return new class extends Migration
             $table->id();
             $table->string('user_name')->nullable();
             $table->string('user_email')->nullable();
+            $table->string('phone')->nullable();
             $table->string('token')->nullable();
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();

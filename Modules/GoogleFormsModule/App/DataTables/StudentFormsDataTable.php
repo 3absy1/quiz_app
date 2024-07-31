@@ -30,9 +30,9 @@ class StudentFormsDataTable extends DataTable
         type="button" data-bs-toggle="dropdown" data-boundary="window" aria-haspopup="true" aria-expanded="false" data-bs-reference="parent">
             <i class="fa-solid fa-ellipsis-vertical fa-xl"></i>
         </button>
-         <div class="dropdown-menu dropdown-menu-end py-2">';
+            <div class="dropdown-menu dropdown-menu-end py-2">';
         //  $html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#editModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item editStudent">Edit</a>';
-         $html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#deleteModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item deleteStudent">Delete</a>';
+            $html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#deleteModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item deleteStudent">Delete</a>';
                 //         /$html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#generateLinkModal" data-id="' . $model->id . '" class="dropdown-item generateLink">Generate Link</a>';
                 //         $html .= '<div class="dropdown-divider"></div><a href="#" class="dropdown-item text-danger delete-this-potential_account" data-id="' . $model->id . '" data-url="' . route('potential_account.destroy', ['potential_account' => $model]) . '">Delete</a></div></div>';
                 $html .= '</div>';
@@ -47,7 +47,11 @@ class StudentFormsDataTable extends DataTable
                 return $model->user_email ;
             })
             ->editColumn('degree', function ($model) {
-                return $model->degree ? $model->degree : 'N/A';
+                if ($model->degree == '') {
+                    return 'N/A';
+                } else {
+                    return $model->degree;
+                }
             })
             ->editColumn('start_time', function ($model) {
                 return $model->start_time ? $model->start_time : 'N/A';
@@ -59,17 +63,24 @@ class StudentFormsDataTable extends DataTable
                 return $model->questions_count ? $model->questions_count : 'N/A';
             })
             ->editColumn('right_answers_count', function ($model) {
-                return $model->right_answers_count ? $model->right_answers_count : 'N/A';
-            })
+                if ($model->right_answers_count == '') {
+                    return 'N/A';
+                }else {
+                    return $model->right_answers_count;
+                }            })
             ->editColumn('wrong_answers_count', function ($model) {
-                return $model->wrong_answers_count ? $model->wrong_answers_count : 'N/A';
+                if ($model->wrong_answers_count == '') {
+                    return 'N/A';
+                }else {
+                    return $model->wrong_answers_count;
+                }
             })
 
-            ->addColumn('', function ($model) {
-                return;
+            ->addColumn('checkbox', function ($model) {
+                return '<input type="checkbox" class="checkbox" id="checkbox_'.$model->id.'" />';
             })
 
-            ->rawColumns(['name','email','action'])
+            ->rawColumns(['name','email','action','checkbox'])
 
             ->setRowId('id');
     }
@@ -150,6 +161,15 @@ class StudentFormsDataTable extends DataTable
                         window.columnTitleArr.push($(column.header()).text());
                     }
                 });
+                        $('#select-all').on('click', function() {
+                var rows = window.LaravelDataTables['user_answers_table'].rows({ search: 'applied' }).nodes();
+                $('input[type=\"checkbox\"]', rows).prop('checked', this.checked);
+                if (this.checked) {
+                    window.LaravelDataTables['user_answers_table'].rows().select();
+                } else {
+                    window.LaravelDataTables['user_answers_table'].rows().deselect();
+                }
+            });
                 window.createExportModalElements();
         }";
         $arrOfFilterBtn = <<<'JS'
@@ -434,8 +454,11 @@ class StudentFormsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('')->content('')->addClass('text-center')->searchable(false)->orderable(false),
-
+            Column::make('checkbox')
+            ->title('<input type="checkbox" id="select-all" class="dt-select-all-checkbox" />')
+            ->searchable(false)
+            ->orderable(false)
+            ->addClass('text-center'),
             Column::make('id')->addClass('text-center'),
             Column::make('name')->addClass('text-center'),
             Column::make('user_email')->addClass('text-center'),

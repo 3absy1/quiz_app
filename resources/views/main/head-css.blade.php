@@ -31,7 +31,11 @@
 <link href="{{asset('assets')}}/css/theme.min.css" type="text/css" rel="stylesheet" id="style-default">
 <link href="{{asset('assets')}}/css/user.min.css" type="text/css" rel="stylesheet" id="user-style-default">
 <link rel="stylesheet" href="{{asset('assets')}}/css/buttons.bootstrap5.css">
-
+<style>
+.hide{
+    display: none;
+}
+</style>
 
 
 @yield('css')

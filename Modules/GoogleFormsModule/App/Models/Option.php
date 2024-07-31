@@ -23,15 +23,4 @@ class Option extends Model
         return $this->hasMany(UserAnswerOption::class);
     }
 
-    protected static function boot()
-    {
-
-        parent::boot();
-        static::deleted(function ($model) {
-
-            $userAnswerOptions = $model->userAnswerOptions();
-            $userAnswerOptions->delete();
-
-        });
-    }
 }

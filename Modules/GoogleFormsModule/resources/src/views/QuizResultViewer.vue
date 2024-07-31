@@ -4,7 +4,8 @@ import { useAuthStore } from "../stores/auth";
 import { useRoute, useRouter } from "vue-router";
 import NavComponent from "../components/NavComponent.vue";
 import { toast } from "vue3-toastify";
-import { svgIcons } from '../components/icons/SvgIcons';
+import { svgIcons } from "../components/icons/SvgIcons";
+import noImageFound from '../assets/noimagefound.jpg'
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -19,14 +20,18 @@ const selectedOptions = ref([]); // for multiple selection
 
 const loader = ref(false);
 
+const doesQuestionOptionsContainsImage = (question)=>{
+        return question.options.some((option)=>option.image)
+}
+
 onMounted(async () => {
   loader.value = true;
   try {
     const res = await fetch(`${authStore.baseUrl}/api/student/${id}/view`, {
-      headers: { Authorization: `Bearer ${authStore.token}` },
+      headers: { Authorization: `Bearer ${authStore.token}`, Accept: "application/json" },
     });
     if (res.status === 401) {
-        authStore.handleUnauthorized();
+      authStore.handleUnauthorized();
     }
     const data = await res.json();
 
@@ -152,7 +157,6 @@ onMounted(async () => {
 //     });
 //   }
 // };
-
 </script>
 
 <template>
@@ -197,53 +201,62 @@ onMounted(async () => {
         <div class="">
           <h4>1.{{ question.question }}</h4>
         </div>
-        <div class="col-12 col-lg-6 pt-3" v-if="!!question.image">
-          <img class="w-100" :src="question.image" alt="" />
+        <div class="col-12 col-lg-10 mx-auto pt-3" v-if="!!question.image">
+          <img class="w-100 " :src="question.image" alt="" />
         </div>
         <!-- Options -->
 
-
         <!-- choose & true&false -->
-        <div
-
-          :class="`option-wrapper rounded  py-2 `"
-          v-for="(answer, i) in question.options"
-        >
-
-
-          <div
-            class="bg-light border shadow-sm rounded-3 d-flex align-items-center mb-1 position-relative"
-          >
-            <!-- <input type="checkbox" class="btn-check" name="btncheck"  @click="checked = answer.id" :checked="checked === answer.id" @change="updateSelectedOption(answer.id, answer.question_id)" :id="answer.id"  autocomplete="off"> -->
-            <input
-              type="checkbox"
-              class="bg-success btn-check"
-              name="btncheck"
-              autocomplete="off"
-            />
-
-            <label
-            style="cursor: default;"
-              :class="`btn btn-light  fs-5 fw-bold w-100 h-100 p-3 `"
-              :for="answer.id"
-              >{{ answer.option }}</label
+        <div class=" row">
+            <div
+            :class="`option-wrapper rounded  py-2 ${doesQuestionOptionsContainsImage(question)?'col-12 col-sm-6 mt-4':''}`"
+            v-for="(answer, i) in question.options"
             >
-         <span v-if="answer.is_answered && answer.is_true" class="position-absolute top-50 translate-middle-y"   style="right: 16px;" v-html="svgIcons.checked" ></span>
-         <i v-if="answer.is_answered && !answer.is_true" class=" fa-solid position-absolute top-50  fa-x fw-bolder text-danger translate-middle-y"style="right: 20px;" ></i>
-          </div>
+            <div
+                :class="`bg-light border shadow-sm rounded-3 d-flex align-items-center mb-1 position-relative ${doesQuestionOptionsContainsImage(question)?'col-12 mt-4':''}`"
+
+            >
+                <!-- <input type="checkbox" class="btn-check" name="btncheck"  @click="checked = answer.id" :checked="checked === answer.id" @change="updateSelectedOption(answer.id, answer.question_id)" :id="answer.id"  autocomplete="off"> -->
+                <div :class="`${doesQuestionOptionsContainsImage(question)?'col-12 ':''}`">
+                    <div
+                    :class="`${doesQuestionOptionsContainsImage(question)?'col-12':'col-12 col-lg-10 mx-auto'}`"
+                    v-if="doesQuestionOptionsContainsImage(question)"
+                    :style="{ height:  'auto ' }"
+                    >
+                        <img class="w-100 custom-image" :src="answer.image||noImageFound" alt="" />
+                    </div>
+
+                    <input
+                    type="checkbox"
+                    class="bg-success btn-check"
+                    name="btncheck"
+                    autocomplete="off"
+                    />
+
+                    <label
+                    style="cursor: default"
+                    :class="`btn btn-light  fs-5 fw-bold w-100 h-100 p-3 `"
+                    :for="answer.id"
+                    >{{ answer.option }}</label
+                    >
+
+                </div>
+                    <span
+                    v-if="answer.is_answered && answer.is_true"
+                    class="position-absolute  translate-middle-y"
+                    style="right: 16px ;bottom: 7px;"
+                    v-html="svgIcons.checked"
+                    ></span>
+                <i
+                v-if="answer.is_answered && !answer.is_true"
+                class="fa-solid position-absolute  fa-x fw-bolder text-danger translate-middle-y"
+                style="right: 20px;bottom: 11px;"
+                ></i>
+            </div>
 
 
-          <div
-            class="col-12 col-lg-6"
-            v-if="!!answer.image"
-            :style="{
-              height: answer.image ? 'auto ' : '0 !important',
-            }"
-          >
-            <img class="w-100" :src="answer.image" alt="" />
-          </div>
+            </div>
         </div>
-
         <!--  -->
       </div>
     </section>
@@ -255,4 +268,13 @@ onMounted(async () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.custom-image{
+    height: 400px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-width: 100%; /* Ensure the width fills the container */
+    min-height: 100%;
+}
+</style>

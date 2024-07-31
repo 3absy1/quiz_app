@@ -16,7 +16,7 @@
                         href="{{ route('admin') }}" role="button">
                         <div class="d-flex align-items-center">
                             <div class="dropdown-indicator-icon">
-                            </div><span class="nav-link-icon"><i class="fa-solid fa-table mt-1"></i></span><span
+                            </div><span class="nav-link-icon"><i class="fa-solid fa-house-chimney mt-1"></i></span><span
                                 class="nav-link-text">Home</span>
                         </div>
                     </a>
@@ -25,11 +25,11 @@
             <li class="nav-item">
                 <!-- parent pages-->
                 <span class="nav-item-wrapper">
-                    <a class="nav-link label-1 {{ Request::url() == route('teachers') ? 'active' : '' }}  "
+                    <a class="nav-link label-1 {{ Request::url() == route('teachers')  ? 'active' : '' }}  "
                         href="{{ route('teachers') }}" role="button">
                         <div class="d-flex align-items-center">
                             <div class="dropdown-indicator-icon">
-                            </div><span class="nav-link-icon"><i class="fa-solid fa-file mt-1"></i></span><span
+                            </div><span class="nav-link-icon"><i class="fa-solid fa-table mt-1"></i></span><span
                                 class="nav-link-text">Teachers </span>
                         </div>
                     </a>
@@ -42,7 +42,7 @@
                         href="{{ route('students') }}" role="button">
                         <div class="d-flex align-items-center">
                             <div class="dropdown-indicator-icon">
-                            </div><span class="nav-link-icon"><i class="fa-solid fa-file mt-1"></i></span><span
+                            </div><span class="nav-link-icon"><i class="fa-solid fa-table mt-1"></i></span><span
                                 class="nav-link-text">Students </span>
                         </div>
                     </a>

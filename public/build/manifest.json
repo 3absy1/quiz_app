@@ -61,9 +61,9 @@
       "assets/fa-v4compatibility-BdHZVUy0.ttf"
     ],
     "css": [
-      "assets/main-zjAFsZpR.css"
+      "assets/main-1GvLgs3y.css"
     ],
-    "file": "assets/main-M_XcQ9Yw.js",
+    "file": "assets/main-5osa_vHB.js",
     "imports": [
       "__plugin-vue_export-helper-ykxjbzhe.js"
     ],
@@ -74,7 +74,7 @@
     "file": "assets/_plugin-vue_export-helper-ykxjbzhe.js"
   },
   "resources/css/app.css": {
-    "file": "assets/app-OHX6L87-.css",
+    "file": "assets/app-ifW5Men9.css",
     "isEntry": true,
     "src": "resources/css/app.css"
   },

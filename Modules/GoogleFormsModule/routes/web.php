@@ -18,68 +18,67 @@ use Modules\GoogleFormsModule\App\Models\UserAnswer;
 |
 */
 // Route::prefix('build')->group(function () {
-    Route::get('googleformsmodule',[ GoogleFormsModuleController::class, 'index'])->name('googleformsmodule');
+Route::get('googleformsmodule', [GoogleFormsModuleController::class, 'index'])->name('googleformsmodule');
 
 
-    Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('admin/teachers', [AdminController::class, 'teachers'])->name('teachers');
-    Route::get('admin/teachers/export', [AdminController::class, 'teachersExport'])->name('teachers.export');
-    Route::get('admin/teachers/selectedExport', [AdminController::class, 'teachersSelectedExport'])->name('teachers.selectedExport');
-    Route::get('admin/teacher/forms', [AdminController::class, 'teacherForm'])->name('teacher.forms');
+    Route::controller(AdminController::class)->group(function () {
 
-    Route::get('admin/teacher/students', [AdminController::class, 'studentForm'])->name('teacher.students');
-    Route::get('admin/teachers/students/export', [AdminController::class, 'studentFormExport'])->name('studentForm.export');
-    Route::get('admin/teachers/students/selectedExport', [AdminController::class, 'studentFormSelectedExport'])->name('studentForm.selectedExport');
+        Route::prefix('admin')->group(function () {
 
-    Route::post('admin/teacher/create', [AdminController::class, 'createTeacher'])->name('teacher.create');
-    Route::put('admin/teacher/{id}', [AdminController::class, 'updateTeacher'])->name('teacher.update');
-    Route::get('admin/teacher/{id}/edit', [AdminController::class, 'editTeacher'])->name('teacher.edit');
+                Route::get('/', [AdminController::class,'index'])->name('admin');
 
-    Route::delete('admin/teacher/{id}/delete', [AdminController::class, 'deleteTeacher'])->name('teacher.delete');
+            Route::prefix('teacher')->group(function () {
 
+                Route::get('/', 'teachers')->name('teachers');
+                Route::get('/export','teachersExport')->name('teachers.export');
+                Route::get('/selectedExport', 'teachersSelectedExport')->name('teachers.selectedExport');
 
-    Route::get('/admin/students', [AdminController::class, 'students'])->name('students');
-    Route::get('admin/students/export', [AdminController::class, 'studentsExport'])->name('students.export');
-    Route::get('admin/students/selectedExport', [AdminController::class, 'studentsSelectedExport'])->name('students.selectedExport');
+                Route::get('/{id}/forms','teacherForm')->name('teacher.forms');
+                Route::get('{ids}/forms/export', 'formsExport')->name('forms.export');
+                Route::get('/forms/selectedExport', 'formsSelectedExport')->name('forms.selectedExport');
 
-    Route::put('admin/student/{id}/edit', [AdminController::class, 'editStudent'])->name('students.edit');
-    Route::delete('admin/student/{id}/delete', [AdminController::class, 'deleteStudent'])->name('student.delete');
+                Route::get('{id}/students', 'studentForm')->name('teacher.students');
+                Route::get('/students/export', 'studentFormExport')->name('studentForm.export');
+                Route::get('/students/selectedExport', 'studentFormSelectedExport')->name('studentForm.selectedExport');
 
-    Route::get('/forms',[ AdminController::class, 'forms'])->name('forms');
-    Route::get('admin/forms/export', [AdminController::class, 'formsExport'])->name('forms.export');
-    Route::get('admin/forms/selectedExport', [AdminController::class, 'formsSelectedExport'])->name('forms.selectedExport');
-    Route::get('/admin', function () {
-        return view('googleformsmodule::Admin.home',[
-            'teachers' => Teacher::count(),
-            'students' => UserAnswer::count(),
-            'forms' => Form::count()
+                Route::post('/create', 'createTeacher')->name('teacher.create');
+                Route::put('/{id}', 'updateTeacher')->name('teacher.update');
+                Route::get('/{id}/edit', 'editTeacher')->name('teacher.edit');
+                Route::delete('/{id}/delete', 'deleteTeacher')->name('teacher.delete');
 
-        ]);
-    })->name('admin');
+            });
+
+            Route::prefix('student')->group(function () {
+
+                Route::get('/', 'students')->name('students');
+                Route::get('/export', 'studentsExport')->name('students.export');
+                Route::get('/selectedExport', 'studentsSelectedExport')->name('students.selectedExport');
+
+                Route::put('/{id}/edit', 'editStudent')->name('students.edit');
+                Route::delete('/{id}/delete', 'deleteStudent')->name('student.delete');
+            });
+        });
+    });
+
 });
 
 
-    // Route::resource('googleformsmodule', GoogleFormsModuleController::class)->names('googleformsmodule');
+// Route::resource('googleformsmodule', GoogleFormsModuleController::class)->names('googleformsmodule');
 
 
-Route::get('/quiz/{id?}', [GoogleFormsModuleController::class , 'index']);
-Route::get('/result', [GoogleFormsModuleController::class , 'index']);
-Route::get('/googleformsmodule/{id?}/quizResults', [GoogleFormsModuleController::class , 'index']);
-Route::get('/googleformsmodule/editForm/{id?}', [GoogleFormsModuleController::class , 'index']);
+Route::get('/quiz/{id?}', [GoogleFormsModuleController::class, 'index']);
+Route::get('/result', [GoogleFormsModuleController::class, 'index']);
+Route::get('/googleformsmodule/admin/{id?}', [GoogleFormsModuleController::class, 'index']);
+Route::get('/googleformsmodule/{id?}/quizResults', [GoogleFormsModuleController::class, 'index']);
+Route::get('/googleformsmodule/editForm/{id?}', [GoogleFormsModuleController::class, 'index']);
 
-Route::get('/enter/{id?}', [GoogleFormsModuleController::class , 'index']);
+Route::get('/enter/{id?}', [GoogleFormsModuleController::class, 'index']);
 
-Route::get('/googleformsmodule/sharelink/{id?}', [GoogleFormsModuleController::class , 'index']);
-Route::get('/googleformsmodule/login', [GoogleFormsModuleController::class , 'index']);
-Route::get('/googleformsmodule/generateQuiz', [GoogleFormsModuleController::class , 'index']);
-Route::get('/googleformsmodule/{id?}/examTakers', [GoogleFormsModuleController::class , 'index']);
+Route::get('/googleformsmodule/sharelink/{id?}', [GoogleFormsModuleController::class, 'index']);
+Route::get('/googleformsmodule/login', [GoogleFormsModuleController::class, 'index']);
+Route::get('/googleformsmodule/generateQuiz', [GoogleFormsModuleController::class, 'index']);
+Route::get('/googleformsmodule/{id?}/examTakers', [GoogleFormsModuleController::class, 'index']);
 
 // });
-
-
-
-
-
-
-

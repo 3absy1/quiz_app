@@ -19,6 +19,20 @@
         </div>
 
         <div class="d-flex align-items-center justify-content-between">
+          <label class="form-check-label me-2" for="phoneSetting"> Phone</label>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input custom-switch"
+              type="checkbox"
+              @click="handleSetting('phone')"
+              role="switch"
+              :checked="formSetting.phone"
+              id="phoneSetting"
+            />
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between">
           <label class="form-check-label me-2" for="PasswordSetting">Password</label>
           <div class="form-check form-switch">
             <input

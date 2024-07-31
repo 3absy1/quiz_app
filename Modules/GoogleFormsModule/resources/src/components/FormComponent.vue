@@ -12,7 +12,7 @@
       <!-- start questions row  -->
       <div v-show="!getFormList[componentIndex].answerKeySelected"  class="form-wrapper row justify-content-between flex-wrap align-items-start">
 
-         <!-- Start DropDown wrapper -->
+        <!-- Start DropDown wrapper -->
             <div  class="col-12 mt-1">
             <div class="dropdown custom-dropdown">
                 <button  class="btn  drop-down-btn fw-bold px-4   dropdown-toggle  d-flex align-items-center border-0 mb-3" style="background-color: #EEF5FF;" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

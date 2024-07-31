@@ -25,6 +25,7 @@ const getAllExams = async () => {
     const res = await fetch(`${authStore.baseUrl}/api/teacher/form`, {
       headers: {
         Authorization: `Bearer ${authStore.token}`,
+        "Accept": "application/json",
       },
     });
     if (res.status === 401) {

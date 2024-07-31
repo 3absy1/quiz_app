@@ -48,6 +48,7 @@
         "datatables.net-responsive": "^3.0.2",
         "datatables.net-select": "^2.0.3",
         "datatables.net-vue3": "^3.0.1",
+        "date-fns": "^3.6.0",
         "lodash.debounce": "^4.0.8",
         "pinia": "^2.1.7",
         "sortablejs": "^1.15.1",

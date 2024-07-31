@@ -31,7 +31,7 @@ class TeacherFormsDataTable extends DataTable
         <i class="fa-solid fa-ellipsis-vertical fa-xl"></i>
     </button>
      <div class="dropdown-menu dropdown-menu-end py-2">';
-     $html .= '<a href="/admin/teacher/students?id=' . $model->id . '" data-bs-target="#formModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item studentTeacher">Students</a>';
+     $html .= '<a href="/admin/teacher/'. $model->id . '/students" data-bs-target="#formModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item studentTeacher">Students</a>';
      //  $html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#deleteModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item deleteTeacher">Delete</a>';
 
                 //         /$html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#generateLinkModal" data-id="' . $model->id . '" class="dropdown-item generateLink">Generate Link</a>';
@@ -53,16 +53,25 @@ class TeacherFormsDataTable extends DataTable
             ->editColumn('degree', function ($model) {
                 return $model->degree ;
             })
-            ->editColumn('password', function ($model) {
-                return $model->password ? $model->password : 'N/A';
-            })
+            // ->editColumn('password', function ($model) {
+            //     return $model->password ? $model->password : 'N/A' .' - '. $model->require_password;
+            // })
             ->editColumn('require_password', function ($model) {
                 if ($model->require_password == null || $model->require_password == 0) {
-                    return false;
+                    return $model->password ? $model->password : 'N/A' .' - '. "false" ;
                 } elseif ($model->require_password == 1) {
+                    return $model->password ? $model->password : 'N/A' .' - '. true;
+                } else {
+                    return $model->require_password.' - '. $model->password;
+                }
+            })
+            ->editColumn('require_phone', function ($model) {
+                if ($model->require_phone == null || $model->require_phone == 0) {
+                    return false;
+                } elseif ($model->require_phone == 1) {
                     return true;
                 } else {
-                    return $model->require_password;
+                    return $model->require_phone;
                 }
             })
             ->editColumn('require_email', function ($model) {
@@ -125,8 +134,8 @@ class TeacherFormsDataTable extends DataTable
             ->editColumn('duration', function ($model) {
                 return $model->duration ? $model->duration : 'N/A';
             })
-            ->addColumn('', function ($model) {
-                return;
+            ->addColumn('checkbox', function ($model) {
+                return '<input type="checkbox" class="checkbox" id="checkbox_'.$model->id.'" />';
             })
 
             ->rawColumns(['name','email','action'])
@@ -207,6 +216,15 @@ class TeacherFormsDataTable extends DataTable
                         window.columnTitleArr.push($(column.header()).text());
                     }
                 });
+                               $('#select-all').on('click', function() {
+                var rows = window.LaravelDataTables['forms_table'].rows({ search: 'applied' }).nodes();
+                $('input[type=\"checkbox\"]', rows).prop('checked', this.checked);
+                if (this.checked) {
+                    window.LaravelDataTables['forms_table'].rows().select();
+                } else {
+                    window.LaravelDataTables['forms_table'].rows().deselect();
+                }
+            });
                 window.createExportModalElements();
         }";
         $arrOfFilterBtn = <<<'JS'
@@ -491,14 +509,18 @@ class TeacherFormsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('')->content('')->addClass('text-center')->searchable(false)->orderable(false),
-
+            Column::make('checkbox')
+            ->title('<input type="checkbox" id="select-all" class="dt-select-all-checkbox" />')
+            ->searchable(false)
+            ->orderable(false)
+            ->addClass('text-center'),
             Column::make('id')->addClass('text-center'),
             Column::make('name')->addClass('text-center'),
             Column::make('desc')->addClass('text-center'),
             Column::make('degree')->addClass('text-center'),
-            Column::make('password')->addClass('text-center'),
+            // Column::make('password')->addClass('text-center'),
             Column::make('require_password')->addClass('text-center'),
+            Column::make('require_phone')->addClass('text-center'),
             Column::make('require_email')->addClass('text-center'),
             Column::make('using_count')->addClass('text-center'),
             Column::make('is_any_time')->addClass('text-center'),

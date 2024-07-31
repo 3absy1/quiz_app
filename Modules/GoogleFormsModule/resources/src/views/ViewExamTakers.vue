@@ -91,6 +91,7 @@ const fetchExamTakers = async () => {
       {
         headers: {
           Authorization: `Bearer ${authStore.token}`,
+          "Accept": "application/json",
         },
       }
     );
@@ -105,7 +106,6 @@ const fetchExamTakers = async () => {
     //handling selecting items if they are on selected array or select all flag is true
 
     data.map((item, idx) => {
-        console.log(selected.value.includes(item.id),selectAllFlag.value)
       if (selected.value.includes(item.id)||selectAllFlag.value) {
         setTimeout(() => {
           datatable.value.selectRow(idx);
@@ -143,7 +143,7 @@ const handleExport = async (type) => {
       body: JSON.stringify({
         ids: selected.value,
         type,
-        selectAll: selectAllFlag.value ? "true" : "false",
+        selectAll: selectAllFlag.value,
         formId: id,
       }),
       method: "POST",
@@ -265,10 +265,6 @@ onMounted(() => {
 
 <template>
   <NavComponent />
-  <button @click="console.log('selected', datatable.getSelectedRows())">
-    print selected
-  </button>
-  {{ selected }}
   <div class="container">
     <!-- <button @click="console.log(params)">click to print params</button> -->
     <div class="d-flex justify-content-between my-3">

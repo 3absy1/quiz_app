@@ -48,6 +48,7 @@ watch(props, async () => {
         {
             headers: {
                 Authorization: `Bearer ${authStore.token}`,
+                "Accept": "application/json",
             },
         },
     );

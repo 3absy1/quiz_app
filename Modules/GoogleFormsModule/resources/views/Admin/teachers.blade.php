@@ -28,9 +28,18 @@ Teachers | Quiz App
                 <form action="{{ route('teachers.export') }}" method="GET" class="me-3">
                     <button class=" collection  btn btn-success"  type="submit" data-bs-dismiss="modal">Export All</button>
                 </form>
-                <div class="btn btn-success exportSelected rounded-1" data-bs-toggle="modal" id="excelModalBtn" name="export" data-exportFormat="excel" data-bs-target="#exportModal">Excel Selected <span id="count">0</span> </div>
+                <div class="btn btn-success exportSelected rounded-1 hide" data-bs-toggle="modal" id="excelModalBtn" name="export" data-exportFormat="excel" data-bs-target="#exportModal">Excel Selected <span id="count">0</span> </div>
             </div>
             <br>
+            @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
         </div>
         <div class="card">
             <div class="container">
@@ -41,10 +50,14 @@ Teachers | Quiz App
                         @method('PUT')
                         <div class="modal-body">
                             <label class="form-label text-1000 fs-0 ps-0 text-capitalize lh-sm mb-2" for="adminTitle">Email</label>
-                            <input class="form-control" id="email" type="text" name="email" value="{{ $teacher->email }}" />
+                            <input class="form-control" id="email" type="email" name="email" value="{{ $teacher->email }}" />
                             <input type="hidden" class="form-control" name="id" value="{{ $teacher->id }}">
+                            <br>
                             <label class="form-label text-1000 fs-0 ps-0 text-capitalize lh-sm mb-2" for="adminTitle">Name</label>
                             <input class="form-control" id="adminTitle" name="name" type="text" value="{{ $teacher->name }}" />
+                            <br>
+                            <label class="form-label text-1000 fs-0 ps-0 text-capitalize lh-sm mb-2" for="adminTitle">Password</label>
+                            <input class="form-control" id="password" name="password" type="password" value="{{ $teacher->password }}" />
                             <br>
                         </div>
                     </x-googleformsmodule::modal>
@@ -227,9 +240,39 @@ function getCheckedCheckboxes() {
     });
 
     $(document).on('click','.dt-select-checkbox',()=>{
+        const selectAllCheckbox = $('#select-all');
         const countEl = $('#count')
+        const btnEl = $('#excelModalBtn')
         const SelectedRowsLength = JSON.parse(localStorage.getItem('teachers_checkBoxIdsArray')).length;
         countEl.text(SelectedRowsLength)
+
+        // handling visbility of export btn
+        if (SelectedRowsLength>0) {
+            btnEl.removeClass('hide')
+        } else {
+            btnEl.addClass('hide')
+
+        }
+        if (SelectedRowsLength < window.LaravelDataTables['teachers_table'].rows({ search: 'applied' }).nodes().length) {
+            selectAllCheckbox.prop('checked', false);
+        } else if(SelectedRowsLength == window.LaravelDataTables['teachers_table'].rows({ search: 'applied' }).nodes().length){
+            selectAllCheckbox.prop('checked', true);
+        }
+
+    });
+    $(document).on('click','.dt-select-all-checkbox',()=>{
+        const countEl = $('#count')
+        const btnEl = $('#excelModalBtn')
+
+        const SelectedRowsLength = JSON.parse(localStorage.getItem('teachers_checkBoxIdsArray')).length;
+        countEl.text(SelectedRowsLength)
+                  // handling visbility of export btn
+                if (SelectedRowsLength>0) {
+            btnEl.removeClass('hide')
+        } else {
+            btnEl.addClass('hide')
+
+        }
     });
 
 

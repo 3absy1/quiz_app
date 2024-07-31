@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted } from "vue";
 import DeleteQuizConfirmationModal from "./DeleteQuizConfirmationModal.vue";
+import { useAuthStore } from "../stores/auth";
 
 //  const { quizData,activeUserData,changeActiveUser } = defineProps(["quizData","activeQuizData","changeActiveQuiz"]);
  const props = defineProps({
@@ -11,6 +12,7 @@ import DeleteQuizConfirmationModal from "./DeleteQuizConfirmationModal.vue";
 
 const emit = defineEmits(["refetchQuizzes"]);
 
+const authStore = useAuthStore();
 
 </script>
 
@@ -22,7 +24,7 @@ const emit = defineEmits(["refetchQuizzes"]);
           <h5 class="card-title fw-bold">{{ quizData.name }}</h5>
           <a
           class="btn btn-outline-secondary fw-bold ms-2 text-muted"
-            :href="`https://quiz.astra-tech.net/enter/${quizData.generated_id}`"
+            :href="`${authStore.baseUrl}/enter/${quizData.generated_id}`"
             target="_blank"
             >Open link</a
           >

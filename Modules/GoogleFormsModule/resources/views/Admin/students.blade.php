@@ -31,7 +31,7 @@
                     <form action="{{ route('students.export') }}" method="GET" class="me-3">
                         <button class="btn btn-success" type="submit" data-bs-dismiss="modal">Export All</button>
                     </form>
-                    <div class="btn btn-success exportSelected rounded-1" data-bs-toggle="modal" id="excelModalBtn"
+                    <div class="btn btn-success exportSelected rounded-1 hide" data-bs-toggle="modal" id="excelModalBtn"
                         name="export" data-exportFormat="excel" data-bs-target="#exportModal">Excel Selected <span
                             id="count">0</span> </div>
                 </div>
@@ -245,10 +245,41 @@
         });
 
         $(document).on('click','.dt-select-checkbox',()=>{
+        const selectAllCheckbox = $('#select-all');
         const countEl = $('#count')
+        const btnEl = $('#excelModalBtn')
+
         const SelectedRowsLength = JSON.parse(localStorage.getItem('user_answers_checkBoxIdsArray')).length;
         countEl.text(SelectedRowsLength)
-    })
+                  // handling visbility of export btn
+                if (SelectedRowsLength>0) {
+            btnEl.removeClass('hide')
+        } else {
+            btnEl.addClass('hide')
+
+        }
+        if (SelectedRowsLength < window.LaravelDataTables['user_answers_table'].rows({ search: 'applied' }).nodes().length) {
+            selectAllCheckbox.prop('checked', false);
+        } else if(SelectedRowsLength == window.LaravelDataTables['user_answers_table'].rows({ search: 'applied' }).nodes().length){
+            selectAllCheckbox.prop('checked', true);
+        }
+    });
+
+    $(document).on('click','.dt-select-all-checkbox',()=>{
+        const countEl = $('#count')
+        const btnEl = $('#excelModalBtn')
+
+        const SelectedRowsLength = JSON.parse(localStorage.getItem('user_answers_checkBoxIdsArray')).length;
+        countEl.text(SelectedRowsLength)
+                  // handling visbility of export btn
+                if (SelectedRowsLength>0) {
+            btnEl.removeClass('hide')
+        } else {
+            btnEl.addClass('hide')
+
+        }
+    });
+
     </script>
     {!! str_replace(
         '"DataTable.render.select()"',

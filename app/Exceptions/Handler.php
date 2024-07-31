@@ -35,10 +35,14 @@ class Handler extends ExceptionHandler
         });
 
         $this->renderable(function (AuthenticationException $e, $request) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorized',
-            ], 401);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ], 401);
+            }
+
+            return redirect()->guest(route('login'));
         });
 
         $this->renderable(function (AuthorizationException $e, $request) {

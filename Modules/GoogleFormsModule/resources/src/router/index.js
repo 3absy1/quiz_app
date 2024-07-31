@@ -12,6 +12,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import QuizResultViewer from "../views/QuizResultViewer.vue";
 import EditForm from "../views/editForm.vue";
+import GenerateQuizFromAdmin from "../views/GenerateQuizFromAdmin.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -114,6 +115,11 @@ const router = createRouter({
             meta: {
                 title: "Enter Exam Page",
             },
+        },
+        {
+            path: "/googleformsmodule/admin/:id",
+            name: "",
+            component: GenerateQuizFromAdmin,
         },
         {
             path: "/result",

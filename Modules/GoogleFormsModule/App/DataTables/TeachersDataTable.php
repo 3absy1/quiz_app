@@ -31,8 +31,8 @@ class TeachersDataTable extends DataTable
          <div class="dropdown-menu dropdown-menu-end py-2">';
          $html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#editModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item editTeacher">Edit</a>';
          $html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#deleteModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item deleteTeacher">Delete</a>';
-         $html .= '<a href="teacher/forms?id=' . $model->id . '" data-bs-target="#formModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item formTeacher">Forms</a>';
-         $html .= '<a href="teacher/students?id=' . $model->id . '" data-bs-target="#formModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item studentTeacher">Students</a>';
+         $html .= '<a href="teacher/' . $model->id . '/forms" data-bs-target="#formModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item formTeacher">Forms</a>';
+         $html .= '<a href="teacher/' . $model->id . '/students" data-bs-target="#formModal' . $model->id . '" data-id="' . $model->id . '" class="dropdown-item studentTeacher">Students</a>';
 
                 //         /$html .= '<a href="#" data-bs-toggle="modal" data-bs-target="#generateLinkModal" data-id="' . $model->id . '" class="dropdown-item generateLink">Generate Link</a>';
                 //         $html .= '<div class="dropdown-divider"></div><a href="#" class="dropdown-item text-danger delete-this-potential_account" data-id="' . $model->id . '" data-url="' . route('potential_account.destroy', ['potential_account' => $model]) . '">Delete</a></div></div>';
@@ -47,11 +47,11 @@ class TeachersDataTable extends DataTable
             ->editColumn('email', function ($model) {
                 return $model->email ;
             })
-            ->addColumn('', function ($model) {
-                return;
+            ->addColumn('checkbox', function ($model) {
+                return '<input type="checkbox" class="checkbox" id="checkbox_'.$model->id.'" />';
             })
 
-            ->rawColumns(['name','email','action'])
+            ->rawColumns(['name','email','action','checkbox'])
 
             ->setRowId('id');
     }
@@ -111,6 +111,15 @@ class TeachersDataTable extends DataTable
                         window.columnTitleArr.push($(column.header()).text());
                     }
                 });
+                    $('#select-all').on('click', function() {
+                var rows = window.LaravelDataTables['teachers_table'].rows({ search: 'applied' }).nodes();
+                $('input[type=\"checkbox\"]', rows).prop('checked', this.checked);
+                if (this.checked) {
+                    window.LaravelDataTables['teachers_table'].rows().select();
+                } else {
+                    window.LaravelDataTables['teachers_table'].rows().deselect();
+                }
+            });
                 window.createExportModalElements();
         }";
         $arrOfFilterBtn = <<<'JS'
@@ -395,8 +404,11 @@ class TeachersDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('')->content('')->addClass('text-center')->searchable(false)->orderable(false),
-
+            Column::make('checkbox')
+            ->title('<input type="checkbox" id="select-all" class="dt-select-all-checkbox" />')
+            ->searchable(false)
+            ->orderable(false)
+            ->addClass('text-center'),
             Column::make('id')->addClass('text-center'),
             Column::make('name')->addClass('text-center'),
             Column::make('email')->addClass('text-center'),

@@ -9,64 +9,32 @@
     @section('content')
     <div class="staff-management">
         <section class="sortContainer row justify-content-around g-" id="sortable-list">
-        <div class="list-item col-6">
-            <div class="item-content bg-white  row justify-content-center  pt-2">
-            <svg class="pull-elements col-12" xmlns="http://www.w3.org/2000/svg" width="32" height="20"
-                viewBox="0 0 32 20" fill="none">
-                <circle cx="28" cy="4" r="4" transform="rotate(90 28 4)" fill="#D9D9D9" />
-                <circle cx="16" cy="4" r="4" transform="rotate(90 16 4)" fill="#D9D9D9" />
-                <circle cx="4" cy="4" r="4" transform="rotate(90 4 4)" fill="#D9D9D9" />
-                <circle cx="28" cy="16" r="4" transform="rotate(90 28 16)" fill="#D9D9D9" />
-                <circle cx="16" cy="16" r="4" transform="rotate(90 16 16)" fill="#D9D9D9" />
-                <circle cx="4" cy="16" r="4" transform="rotate(90 4 16)" fill="#D9D9D9" />
-            </svg>
+            <div class="col-lg-4">
+                <x-googleformsmodule::tap-card href="{{ route('teachers') }}" title="{{ __('Teachers') }}"
+                    description=" Admins can view, edit, create, and delete teacher profiles. Review quizzes created by each teacher and the students assigned to them.">
+                    <i class="fa-solid fa-chalkboard-teacher fa-xl"></i>
+                    <span class="d-block text-900 fw-normal mb-0 fs-1">{{ $teachers }}</span>
 
-            <div class="py-5">
-                <span class="order">Teachers :</span>
-
-                <span class="order">{{$teachers}}</span>
+                </x-googleformsmodule::tap-card>
             </div>
-            </div>
-        </div>
 
-        <div class="list-item col-6">
-            <div class="item-content bg-white  row justify-content-center  pt-2">
-            <svg class="pull-elements col-12" xmlns="http://www.w3.org/2000/svg" width="32" height="20"
-                viewBox="0 0 32 20" fill="none">
-                <circle cx="28" cy="4" r="4" transform="rotate(90 28 4)" fill="#D9D9D9" />
-                <circle cx="16" cy="4" r="4" transform="rotate(90 16 4)" fill="#D9D9D9" />
-                <circle cx="4" cy="4" r="4" transform="rotate(90 4 4)" fill="#D9D9D9" />
-                <circle cx="28" cy="16" r="4" transform="rotate(90 28 16)" fill="#D9D9D9" />
-                <circle cx="16" cy="16" r="4" transform="rotate(90 16 16)" fill="#D9D9D9" />
-                <circle cx="4" cy="16" r="4" transform="rotate(90 4 16)" fill="#D9D9D9" />
-            </svg>
-            <div class="py-5">
-                <span class="order">Students :</span>
-
-                <span class="order">{{$students}}</span>
+            <div class="col-lg-4">
+                <x-googleformsmodule::tap-card href="{{ route('students') }}" title="{{ __('Students') }}"
+                    description="View all quizzes created by teachers. Admins can see which students answered each quiz and delete quizzes as needed.">
+                    <i class="fa-solid fa-user fa-xl"></i>
+                    <span class="d-block text-900 fw-normal mb-0 fs-1">{{ $students }}</span>
+                </x-googleformsmodule::tap-card>
             </div>
-            </div>
-        </div>
 
 
-        <div class="list-item col-6">
-            <div class="item-content bg-white  row justify-content-center  pt-2">
-            <svg class="pull-elements col-12" xmlns="http://www.w3.org/2000/svg" width="32" height="20"
-                viewBox="0 0 32 20" fill="none">
-                <circle cx="28" cy="4" r="4" transform="rotate(90 28 4)" fill="#D9D9D9" />
-                <circle cx="16" cy="4" r="4" transform="rotate(90 16 4)" fill="#D9D9D9" />
-                <circle cx="4" cy="4" r="4" transform="rotate(90 4 4)" fill="#D9D9D9" />
-                <circle cx="28" cy="16" r="4" transform="rotate(90 28 16)" fill="#D9D9D9" />
-                <circle cx="16" cy="16" r="4" transform="rotate(90 16 16)" fill="#D9D9D9" />
-                <circle cx="4" cy="16" r="4" transform="rotate(90 4 16)" fill="#D9D9D9" />
-            </svg>
-            <div class="py-5">
-                <span class="order">Forms :</span>
+            <div class="col-lg-4">
+                <x-googleformsmodule::tap-card href="#" title="{{ __('Forms') }}"
+                    description="View all quizzes created by teachers. Admins can see which students answered each quiz and delete quizzes as needed.">
+                    <i class="fa-solid fa-file-alt fa-xl"></i>
+                    <span class="d-block text-900 fw-normal mb-0 fs-1">{{ $forms }}</span>
 
-                <span class="order">{{$forms}}</span>
+                </x-googleformsmodule::tap-card>
             </div>
-            </div>
-        </div>
 
 
         </section>

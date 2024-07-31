@@ -3,6 +3,8 @@ import { defineStore } from "pinia";
 import { toast } from "vue3-toastify";
 import router from "../router";
 import { formStore } from "../stores/formStore";
+import { useRoute } from "vue-router";
+
 // const useFormStore = formStore()
 
 export const useAuthStore = defineStore("authStore", () => {
@@ -18,11 +20,11 @@ export const useAuthStore = defineStore("authStore", () => {
     );
 
     // on build uncomment below
-    // const baseUrl = ref(window.location.origin);
+     const baseUrl = ref(window.location.origin);
 
     // on local un comment below
 
-    const baseUrl = "https://quiz.astra-tech.net";
+    //const baseUrl = "https://quiz.astra-tech.net";
 
     const authenticate = async (credentials, url) => {
         try {
@@ -79,7 +81,10 @@ export const useAuthStore = defineStore("authStore", () => {
                     Authorization: `Bearer ${token.value}`,
                 },
             });
-            const data = await res.json();
+        } catch (error) {
+            console.log(error)
+        }
+
             //clearing the data locally
             email.value = null;
             id.value = null;
@@ -91,27 +96,27 @@ export const useAuthStore = defineStore("authStore", () => {
 
             localStorage.removeItem("token");
             localStorage.removeItem("id");
-
-            if (!data.success) {
-                throw new Error(
-                    data.message || "something went wrong try again",
-                );
-            }
+            console.log('95')
             router.push("/googleformsmodule/login").then(() => {
-                toast.success(data.message, {
+                toast.success('logged out successfully', {
                     autoClose: 2000,
                     position: "top-left",
                 });
             });
-        } catch (error) {
-            toast.error("something went wrong", {
+            console.log('102')
+    };
+
+    const blockQuizAccess=(formToken)=>{
+        console.log(useRoute())
+        router.replace(`/enter/${formToken}`).then(() => {
+            toast.error("Unauthorized! exam time expired", {
                 autoClose: 2000,
                 position: "top-left",
             });
-        }
-    };
-
+        });
+    }
     const handleUnauthorized = () => {
+
         email.value = null;
         id.value = null;
         name.value = null;
@@ -139,5 +144,6 @@ export const useAuthStore = defineStore("authStore", () => {
         logout,
         handleUnauthorized,
         baseUrl,
+        blockQuizAccess
     };
 });

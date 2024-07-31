@@ -1,47 +1,61 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+@extends('auth.layouts.app')
+@section('title')
+    Sign in Page
+@endsection
+@section('content')
+    <main class="main" id="top">
+        <div class="container-fluid px-0" data-layout="container">
+            <div class="container">
+                <div class="row flex-center min-vh-100 py-5">
+                    <div class="col-sm-10 col-md-8 col-lg-5 col-xl-5 col-xxl-3"><a
+                            class="d-flex flex-center text-decoration-none mb-4" href="index.html">
+                            <div class="d-flex align-items-center fw-bolder fs-5 d-inline-block"><img
+                                    src="{{ asset('auth') }}/assets/img/icons/logo.png" alt="phoenix" width="58" />
+                            </div>
+                        </a>
+                        <div class="text-center mb-7">
+                            <h3 class="text-1000">Sign In</h3>
+                            <p class="text-700">Get access to your account</p>
+                        </div>
+                        @include('auth.layouts.alerts')
+                        <form method="POST" action="{{ route('login') }}">
+                            @csrf
+                            <div class="mb-3 text-start"><label class="form-label" for="email">Email address</label>
+                                <div class="form-icon-container">
+                                    <input class="form-control form-icon-input" id="email" name="email"
+                                        value="{{ old('email') }}" required autofocus type="email"
+                                        placeholder="name@example.com" /><span
+                                        class="fas fa-user text-900 fs--1 form-icon"></span>
+                                        {{-- @error('email')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror --}}
+                                </div>
+                            </div>
+                            <div class="mb-3 text-start"><label class="form-label" for="password">Password</label>
+                                <div class="form-icon-container">
+                                    <input class="form-control form-icon-input" type="password" name="password"
+                                        placeholder="Password" required />
+                                    <span class="fas fa-key text-900 fs--1 form-icon"></span>
+                                    {{-- @error('password')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror --}}
+                                </div>
+                            </div>
+                            <div class="row flex-between-center mb-7">
+                                <div class="col-auto">
+                                    <div class="form-check mb-0"><input class="form-check-input" id="basic-checkbox"
+                                            type="checkbox" checked="checked" /><label class="form-check-label mb-0"
+                                            for="basic-checkbox">Remember me</label></div>
+                                </div>
+                                <div class="col-auto"><a class="fs--1 fw-semi-bold" href="{{ route('password.request') }}">Forgot
+                                        Password?</a></div>
+                            </div><button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
+                        </form>
+                        {{-- <div class="text-center"><a class="fs--1 fw-bold" href="{{ route('register') }}">Create an account</a></div> --}}
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+    </main>
+@endsection

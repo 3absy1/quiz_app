@@ -27,6 +27,14 @@ use Modules\GoogleFormsModule\App\Exports\TeacherExport;
 
 class AdminController extends Controller
 {
+    public function index (){
+
+        return view('googleformsmodule::Admin.home', [
+            'teachers' => Teacher::count(),
+            'students' => UserAnswer::count(),
+            'forms' => Form::count()
+        ]);
+    }
     public function teachers(TeachersDataTable $dataTable)
     {
         // return view('googleformsmodule::Admin.teachers', [
@@ -62,19 +70,28 @@ class AdminController extends Controller
         return Excel::download(new TeacherExport($data), 'Selected_Teachers.xlsx');
     }
 
-    public function teacherForm(Request $request, TeacherFormsDataTable $dataTable)
+    public function teacherForm($id,Request $request, TeacherFormsDataTable $dataTable)
     {
-        $id = $request->query('id');
+        if(!$id){
+            $forms=Form::all();
+            return $dataTable->with('forms', $forms)->render('googleformsmodule::Admin.teacherForms', compact('id'));
+        }
         $teacher = Teacher::find($id);
         $forms = Form::where('teacher_id', $teacher->id)->get();
+         $formsId=$forms->pluck('id')->toArray();
+         if (empty($formsId)){
+            $formsId=[];
+            return $dataTable->with('forms', $forms)->render('googleformsmodule::Admin.teacherForms', compact('id','formsId'));
+        }else{
+            return $dataTable->with('forms', $forms)->render('googleformsmodule::Admin.teacherForms', compact('id','formsId'));
 
-        return $dataTable->with('forms', $forms)->render('googleformsmodule::Admin.teacherForms');
+        }
     }
 
 
-    public function studentForm(Request $request, StudentFormsDataTable $dataTable)
+    public function studentForm($id,Request $request, StudentFormsDataTable $dataTable)
     {
-        $id = $request->query('id');
+        // $id = $request->query('id');
         $teacher = Teacher::find($id);
         if(!$teacher){
             $students = UserAnswer::where('form_id', $id)->get();
@@ -83,7 +100,6 @@ class AdminController extends Controller
 
         $forms = Form::where('teacher_id', $teacher->id)->pluck('id');
         $students = UserAnswer::whereIn('form_id', $forms)->get();
-
         return $dataTable->with('userAnswers', $students)->render('googleformsmodule::Admin.studentForms',compact('students','id'));
     }
 
@@ -129,20 +145,16 @@ class AdminController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->all()
-            ], 422);
+            return redirect()->back()->withErrors(['error' =>$validator->errors()->all()]);
+        }else{
+            $teacher = Teacher::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            return redirect()->route('teachers')->with('success', 'Teacher record created successfully');
         }
-
-        $teacher = Teacher::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        return redirect()->route('teachers')->with('success', 'Teacher record created successfully');
-
     }
 
 
@@ -152,22 +164,30 @@ class AdminController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name'     => 'required|string|max:255|min:3',
-            'email'    => 'required|email|unique:teachers,email|max:255',
+            'email'    => 'required|email|max:255',
+            'password'    => 'required|max:255|min:7',
+
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->all()
-            ], 422);
-        }
+            return redirect()->back()->withErrors(['error' =>$validator->errors()->all()]);
+
+        }else{
             $teacher->name = $request->name;
 
             $teacher->email = $request->email;
+            if ($request->password == $teacher->password){
+                $teacher->save();
+                return redirect()->route('teachers')->with('success', 'Teacher record updated successfully');
 
-        $teacher->save();
+            }else{
+                $teacher->password = Hash::make($request->password);
+                $teacher->save();
+                return redirect()->route('teachers')->with('success', 'Teacher record updated successfully');
+            }
+        }
 
-        return redirect()->route('teachers')->with('success', 'Teacher record updated successfully');
+
 
     }
 
@@ -181,10 +201,8 @@ class AdminController extends Controller
     {
         $teacher = Teacher::where('id', $id)->first();
         if (!$teacher) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Teacher not found'
-            ], 404);
+            return redirect()->back()->withErrors(['error' =>'Teacher not found']);
+
         }
         $teacher->delete();
 
@@ -235,10 +253,8 @@ class AdminController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->all()
-            ], 422);
+            return redirect()->back()->withErrors(['error' =>$validator->errors()->all()]);
+
         }
 
         $student = Teacher::create([
@@ -342,10 +358,8 @@ class AdminController extends Controller
     {
         $student = UserAnswer::find($id);
         if (!$student) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Student not found'
-            ], 404);
+            return redirect()->back()->withErrors(['error' =>'Student not found']);
+
         }
 
         $student_questions = UserAnswerQuestion::where('user_answers_id', $id)->get();
@@ -363,25 +377,25 @@ class AdminController extends Controller
         return redirect()->back();
     }
 
-
-    public function forms()
+    public function formsExport($ids)
     {
-        $quizzes=Form::all();
-        $question = Question::all();
+        if(!$ids){
 
-        return response()->json([
-            'success' => true,
-            'form'  => $quizzes,
-            'question' => QuestionResource::collection($question),
-
-        ], 200);
-    }
+        }    else{
+        $idArray = explode(',', $ids);
 
 
-    public function formsExport()
-    {
-        $data = Form::select('name', 'desc','degree','question_count', 'password', 'time_out','date','start_time','end_time', 'duration')->get();
-        return Excel::download(new FormExport($data), 'Forms.xlsx');
+            $allData = collect();
+
+            foreach ($idArray as $id) {
+                $data = Form::select('name', 'desc','degree','question_count', 'password', 'time_out','date','start_time','end_time', 'duration')->where('id', $id)->get();
+                $allData = $allData->merge($data);
+            }
+
+
+            return Excel::download(new FormExport($allData), 'Forms.xlsx');
+        }
+
     }
 
     public function formsSelectedExport(Request $request)

@@ -57,6 +57,7 @@ export const formStore = defineStore("formStore", {
         ],
         formSetting: {
             username: true,
+            phone:false,
             password: false,
             passwordValue: "",
             userQuestionCountSwitch: false,
@@ -92,16 +93,11 @@ export const formStore = defineStore("formStore", {
         quizList: [],
 
         // un comment on deploy
-        // baseUrl : `${window.location.origin}`,
+         baseUrl : `${window.location.origin}`,
 
         // un comment on local
-        baseUrl: `https://quiz.astra-tech.net`,
+        //baseUrl: `https://quiz.astra-tech.net`,
 
-        //   Enter Form Link
-        generatedFormID: null,
-
-        // Token & generated id
-        quizToken: null,
         degree: null,
     }),
 
@@ -664,7 +660,7 @@ export const formStore = defineStore("formStore", {
         },
 
         // prepare Data before send it to  api
-        prepareFormDataObj(apiData) {
+        prepareFormDataObj(apiData,id) {
             const formDataObj = new FormData();
 
             // Append formData to formDataObj
@@ -719,13 +715,14 @@ export const formStore = defineStore("formStore", {
 
             // Prepare Form DataObj
             // Call Api
-            this.handleCreateQuiz(formDataObj);
+            this.handleCreateQuiz(formDataObj,id);
         },
 
         prepareFormDataObjWithReturn(apiData) {
             const formDataObj = new FormData();
 
             // Append formData to formDataObj
+            console.log(apiData.formData)
             apiData.formData.forEach((formDataItem, index) => {
                 Object.entries(formDataItem).forEach(([key, value]) => {
                     if (key === "answers" && Array.isArray(value)) {
@@ -801,7 +798,7 @@ export const formStore = defineStore("formStore", {
             return answers.some((answer) => answer.isCorrect);
         },
 
-        prepareFormData() {
+        prepareFormData(id) {
             let hasError = [];
             const formData = this.formList.map((item) => {
                 item.questionError = null;
@@ -923,6 +920,7 @@ export const formStore = defineStore("formStore", {
                     this.formList[0].formInfo.sectionDescription,
                 formImg: null,
                 email: this.formSetting.username,
+                phone: this.formSetting.phone,
                 password: this.formSetting.password,
                 passwordValue: this.formSetting.passwordValue,
                 userQuestionCount: this.formSetting.userQuestionCount,
@@ -982,11 +980,13 @@ export const formStore = defineStore("formStore", {
                 this.generatedFormID = null;
                 return;
             }
-            this.prepareFormDataObj(apiData);
+            this.prepareFormDataObj(apiData,id);
         },
 
         prepareFormDataWithReturn() {
             let hasError = [];
+            // to do => handle formlist and form data (the url attribute was removed from the form data and we need it to handle not sending the image file :))
+            console.log('form list before processing ! =>', this.formList)
             const formData = this.formList.map((item) => {
                 item.questionError = null;
                 item.titleError = null;
@@ -1015,11 +1015,18 @@ export const formStore = defineStore("formStore", {
                         option.answerError = null;
                     }
 
-                    return {
+                    const returnedObject = {
                         value: option.value,
                         isCorrect: option.isCorrect,
                         img: option.img,
-                    };
+                    }
+
+                    // if we have the image url then don't sent null to replace the image
+                    if(option.image&&!option.img){
+                        delete returnedObject.img
+                    }
+
+                    return returnedObject;
                 });
 
                 if (!this.validateCorrectAnswer(answers)) {
@@ -1028,13 +1035,20 @@ export const formStore = defineStore("formStore", {
                     hasError.push("isCorrect");
                 }
 
-                return {
+                const returnedObject ={
                     questionType: item.selectedValue,
                     questionValue: item.questionValue,
                     questionImg: item.questionImg,
                     questionMark: item.questionMark,
                     answers,
-                };
+                }
+
+                // if we have the image url then don't sent null to replace the image
+                if(item.imageFileDataUrl&&!item.questionImg){
+                    delete returnedObject.questionImg
+                }
+
+                return returnedObject;
             });
 
             // setting Validation
@@ -1107,6 +1121,7 @@ export const formStore = defineStore("formStore", {
                     this.formList[0].formInfo.sectionDescription,
                 formImg: null,
                 email: this.formSetting.username,
+                phone: this.formSetting.phone,
                 password: this.formSetting.password,
                 passwordValue: this.formSetting.passwordValue,
                 userQuestionCount: this.formSetting.userQuestionCount,
@@ -1122,7 +1137,7 @@ export const formStore = defineStore("formStore", {
                     durationSwitch: this.formSetting.examTime.durationSwitch,
                 },
             };
-
+            console.log('api data sent to next stage =>',formData)
             const apiData = {
                 formData,
                 formSettingData,
@@ -1172,11 +1187,11 @@ export const formStore = defineStore("formStore", {
         // call apis
 
         // handle Create Quiz API
-        handleCreateQuiz(formDataObj) {
-            formDataObj.append("teacher_id", localStorage.getItem("id")); // remove me  ------------->
+        handleCreateQuiz(formDataObj,id) {
+            formDataObj.append("teacher_id", id?id:localStorage.getItem("id"));
             this.generatedFormID = null;
             // console.log(this.token , '"gggg"');
-            fetch(`${this.baseUrl}/api/googleformsmodules`, {
+            fetch(`${this.baseUrl}/api/${id?'admin/generateQuiz':'googleformsmodules'}`, {
                 method: "POST",
                 body: formDataObj,
                 headers: {
@@ -1221,21 +1236,17 @@ export const formStore = defineStore("formStore", {
             this.generatedFormID = generated_id;
         },
 
-        handleQuizAnswer(answers) {
-            this.generatedFormID =
-                this.generatedFormID == null
-                    ? localStorage.getItem("quizId")
-                    : this.generatedFormID;
+        handleQuizAnswer(answers,formToken) {
             this.quizToken =
                 this.quizToken == null
-                    ? localStorage.getItem("token")
+                    ? localStorage.getItem("quizToken")
                     : this.quizToken;
             const formData = {
                 token: this.quizToken,
                 answers: answers,
             };
             fetch(
-                `${this.baseUrl}/api/googleformsmodules/submitformAnswers/${this.generatedFormID}`,
+                `${this.baseUrl}/api/googleformsmodules/submitformAnswers/${formToken}`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -1247,7 +1258,7 @@ export const formStore = defineStore("formStore", {
             )
                 .then((response) => {
                     if (response.status === 401) {
-                        authStore.handleUnauthorized();
+                        authStore.blockQuizAccess(formToken);
                     }
                     return response.json();
                 })

@@ -4,31 +4,39 @@ Forms | Quiz App
 @endsection
 
 @section('css')
+{{-- @vite(['Modules/GoogleFormsModule/resources/src/main.js']) --}}
+<style>
+iframe {
+    display:block;
+    width:100%;
+    height:100%;
+  }
+  </style>
 @endsection
 
 @section('content')
+
 <section class="table-sec pt-3">
     <div class="container px-2 px-md-5">
         <div class="align-items-start border-bottom flex-column">
             <x-googleformsmodule::first-head label="Form table" icon="table" />
-            {{-- <button class="btn-primary btn border" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Create</button> --}}
-            {{-- <x-googleformsmodule::modal modalId="exampleModal" formAction="{{ route('teacher.create') }}" formMethod="POST" modalTitle="Create Teacher">
-                <label class="form-label text-1000 fs-0 ps-0 text-capitalize lh-sm mb-2" for="code">Email</label>
-                <input class="form-control" id="email" type="email" name="email" placeholder="admin@gmail.com" required />
-                <br>
-                <label class="form-label text-1000 fs-0 ps-0 text-capitalize lh-sm mb-2" for="adminTitle">Name</label>
-                <input class="form-control" id="adminTitle" name="name" type="text" placeholder="Ahmed" required />
-                <br>
-                <label class="form-label text-1000 fs-0 ps-0 text-capitalize lh-sm mb-2" for="password">Password</label>
-                <input class="form-control" id="password" name="password" type="password" placeholder="" required />
-                <br>
-            </x-googleformsmodule::modal> --}}
+            <x-googleformsmodule::createModal modalId="exampleModal" formMethod="POST" modalTitle="Create Form">
+                <iframe src=" {{url('/googleformsmodule/admin/')}}/{{$id}}" frameborder="0" id="modalFrame">
+                </iframe>
+            </x-googleformsmodule::createModal>
+
             <div class="d-flex align-items-center">
-                <form action="{{ route('forms.export') }}" method="GET" class="me-3">
+                <button class="btn-primary btn border me-3" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">Create</button>
+
+                @if(empty(implode(',', $formsId)))
+
+                @else
+                <form action="{{ route('forms.export', ['ids' => implode(',', $formsId)]) }}" method="GET" class="me-3">
                     <button class="btn btn-success" type="submit" data-bs-dismiss="modal">Export All</button>
 
                 </form>
-                <div class="btn btn-success exportSelected rounded-1" data-bs-toggle="modal" id="excelModalBtn" name="export" data-exportFormat="excel" data-bs-target="#exportModal">Excel Selected <span id="count">0</span> </div>
+                    @endif
+                <div class="btn btn-success exportSelected rounded-1 hide" data-bs-toggle="modal" id="excelModalBtn" name="export" data-exportFormat="excel" data-bs-target="#exportModal">Excel Selected <span id="count">0</span> </div>
             </div>
             <br>
         </div>
@@ -120,6 +128,17 @@ Forms | Quiz App
 
 @section('js')
 
+<script>
+    setTimeout(() => {
+        const modalFrame = document.getElementById('modalFrame')
+        const iframeDoc = modalFrame.contentDocument || modalFrame.contentWindow.document;
+        const buttons = iframeDoc.querySelectorAll('button')
+        const sendBtn = iframeDoc.querySelector('button')
+        sendBtn.addEventListener("click", () => {
+            window.location.reload();
+        });
+    }, 3000);
+</script>
 
 <script>
 var columnTitleArr = window.columnTitleArr = [];
@@ -226,12 +245,46 @@ function getCheckedCheckboxes() {
 
 
     $(document).on('click','.dt-select-checkbox',()=>{
+        const selectAllCheckbox = $('#select-all');
         const countEl = $('#count')
+        const btnEl = $('#excelModalBtn')
+
         const SelectedRowsLength = JSON.parse(localStorage.getItem('forms_checkBoxIdsArray')).length;
         countEl.text(SelectedRowsLength)
+               // handling visbility of export btn
+            if (SelectedRowsLength>0) {
+            btnEl.removeClass('hide')
+        } else {
+            btnEl.addClass('hide')
+
+        }
+
+        if (SelectedRowsLength < window.LaravelDataTables['forms_table'].rows({ search: 'applied' }).nodes().length) {
+            selectAllCheckbox.prop('checked', false);
+        } else if(SelectedRowsLength == window.LaravelDataTables['forms_table'].rows({ search: 'applied' }).nodes().length){
+            selectAllCheckbox.prop('checked', true);
+        }
     });
 
+
+    $(document).on('click','.dt-select-all-checkbox',()=>{
+        const countEl = $('#count')
+        const btnEl = $('#excelModalBtn')
+        const SelectedRowsLength = JSON.parse(localStorage.getItem('forms_checkBoxIdsArray')).length;
+        countEl.text(SelectedRowsLength)
+                  // handling visbility of export btn
+                if (SelectedRowsLength>0) {
+            btnEl.removeClass('hide')
+        } else {
+            btnEl.addClass('hide')
+
+        }
+    });
 </script>
+
+
+
+
 {!! str_replace(
 '"DataTable.render.select()"',
 'DataTable.render.select()',

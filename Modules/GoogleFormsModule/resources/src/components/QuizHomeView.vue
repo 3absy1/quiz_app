@@ -93,6 +93,10 @@ export default {
     forceUpdateKey() {
       this.incrementSortableKey();
     },
+
+    formComponentResolver (question){
+        console.log(question)
+    },
     onSortChange() {},
   },
   mounted() {

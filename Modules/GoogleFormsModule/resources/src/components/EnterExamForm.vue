@@ -70,6 +70,29 @@
                             }}</span>
                         </p>
                     </div>
+                    
+                    <div
+                        v-if="generateFormObj?.require_phone"
+                        class="mb-3 col-lg-10 mx-lg-auto"
+                    >
+                        <label class="mb-1" for="Password">Phone:</label>
+                        <input
+                            id="phone"
+                            class="form-control"
+                            type="number"
+                            v-model="phone"
+                            @blur="v$.phone.$touch()"
+                        />
+                        <p
+                            v-for="error of v$.phone.$errors"
+                            :key="error.$uid"
+                        >
+                            <span class="text-danger">{{
+                                error.$message
+                            }}</span>
+                        </p>
+                    </div>
+
                     <div class="my-3 mx-lg-auto col-lg-10">
                         <button
                             @click.prevent="submitForm"
@@ -88,7 +111,7 @@
 import { mapState, mapActions } from "pinia";
 import { formStore } from "../stores/formStore";
 import { useVuelidate } from "@vuelidate/core";
-import { required, minLength, email } from "@vuelidate/validators";
+import { required, minLength, email ,numeric} from "@vuelidate/validators";
 import { toast } from "vue3-toastify";
 
 export default {
@@ -101,6 +124,7 @@ export default {
             generateFormObj: {},
             userName: "",
             password: "",
+            phone: "",
             userInfoError: null,
         };
     },
@@ -108,6 +132,7 @@ export default {
         return {
             userName: { required, email },
             password: { required },
+            phone:{required,numeric}
         };
     },
     computed: {
@@ -124,6 +149,7 @@ export default {
                 generated_id: this.generateFormObj.generated_id,
                 user_email: this.userName,
                 password: this.password,
+                phone: this.phone,
             };
 
             await fetch(
@@ -142,10 +168,8 @@ export default {
                         this.$router.push({
                             path: `/quiz/${data.generated_id}`,
                         });
-                        /* localStorage.setItem("token", data.token)*/
-                        localStorage.setItem("quizId", data.generated_id);
-                        localStorage.removeItem("quizData");
-                        localStorage.removeItem("countdownTime");
+                         localStorage.setItem("quizToken", data.token)
+                        // localStorage.setItem("quizId", data.generated_id);
                     } else {
                         this.userInfoError = data.message.toString();
                         toast.error(data.message.toString(), {
@@ -164,6 +188,7 @@ export default {
                     `${this.baseUrl}/api/googleformsmodules/showReq/${this.$route.params.id}`,
                     {
                         method: "GET",
+                        "Accept": "application/json",
                     },
                 )
                     .then((response) => response.json())

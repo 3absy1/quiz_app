@@ -88,7 +88,7 @@ const mapResDataToStore = (data) => {
           : "checkbox",
       required: false,
       isSelected: false,
-      regularOptions: [""], // fill with options data later
+      regularOptions: [...answersFormattedForStore], // fill with options data later
       answerKeySelected: false,
       questionMark: question.degree,
       previousSelectedValue: undefined,
@@ -234,6 +234,7 @@ onMounted(async () => {
   try {
     const res = await fetch(`${authStore.baseUrl}/api/teacher/form/${id}`, {
       headers: { Authorization: `Bearer ${authStore.token}` },
+      "Accept": "application/json",
     });
     const data = await res.json();
     if (res.status === 401) {

@@ -45,7 +45,11 @@ class StudentsDataTable extends DataTable
                 return $model->user_email ;
             })
             ->editColumn('degree', function ($model) {
-                return $model->degree ? $model->degree : 'N/A';
+                if ($model->degree == '') {
+                    return 'N/A';
+                }else {
+                    return $model->degree;
+                }
             })
             ->editColumn('start_time', function ($model) {
                 return $model->start_time ? $model->start_time : 'N/A';
@@ -57,17 +61,24 @@ class StudentsDataTable extends DataTable
                 return $model->questions_count ? $model->questions_count : 'N/A';
             })
             ->editColumn('right_answers_count', function ($model) {
-                return $model->right_answers_count ? $model->right_answers_count : 'N/A';
-            })
+                if ($model->right_answers_count == '') {
+                    return 'N/A';
+                }else {
+                    return $model->right_answers_count;
+                }            })
             ->editColumn('wrong_answers_count', function ($model) {
-                return $model->wrong_answers_count ? $model->wrong_answers_count : 'N/A';
+                if ($model->wrong_answers_count == '') {
+                    return 'N/A';
+                }else {
+                    return $model->wrong_answers_count;
+                }
             })
 
-            ->addColumn('', function ($model) {
-                return;
+            ->addColumn('checkbox', function ($model) {
+                return '<input type="checkbox" class="checkbox" id="checkbox_'.$model->id.'" />';
             })
 
-            ->rawColumns(['name','email','action'])
+            ->rawColumns(['name','user_email','degree','start_time','end_time','questions_count','right_answers_count','wrong_answers_count','action','checkbox'])
 
             ->setRowId('id');
     }
@@ -127,6 +138,15 @@ class StudentsDataTable extends DataTable
                         window.columnTitleArr.push($(column.header()).text());
                     }
                 });
+                        $('#select-all').on('click', function() {
+                var rows = window.LaravelDataTables['user_answers_table'].rows({ search: 'applied' }).nodes();
+                $('input[type=\"checkbox\"]', rows).prop('checked', this.checked);
+                if (this.checked) {
+                    window.LaravelDataTables['user_answers_table'].rows().select();
+                } else {
+                    window.LaravelDataTables['user_answers_table'].rows().deselect();
+                }
+            });
                 window.createExportModalElements();
         }";
         $arrOfFilterBtn = <<<'JS'
@@ -411,8 +431,11 @@ class StudentsDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('')->content('')->addClass('text-center')->searchable(false)->orderable(false),
-
+            Column::make('checkbox')
+            ->title('<input type="checkbox" id="select-all" class="dt-select-all-checkbox" />')
+            ->searchable(false)
+            ->orderable(false)
+            ->addClass('text-center'),
             Column::make('id')->addClass('text-center'),
             Column::make('name')->addClass('text-center'),
             Column::make('user_email')->addClass('text-center'),
